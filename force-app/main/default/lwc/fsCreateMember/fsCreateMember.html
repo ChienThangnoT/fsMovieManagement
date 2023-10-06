@@ -1,0 +1,24 @@
+<template>
+    <lightning-card title="Your Memberships" icon-name="standard:account">
+        <div class="slds-m-around_medium">
+            
+            <template if:true={memberships.data}>
+                <ul>
+                    <template for:each={memberships.data} for:item="membership">
+                        <li key={membership.Id}>{membership.Name}</li>
+                        <li key={membership.Id}>{membership.Rank__c}</li>
+                        <li key={membership.Id}>{membership.Address__c}</li>
+                        <li key={membership.Id}>{membership.Email__c}</li>
+                    </template>
+                </ul>
+            </template>
+            <div class="slds-m-bottom_medium">
+                <lightning-button label="New Membership"
+                    onclick={createNewMembership}></lightning-button>
+            </div>
+            <template if:true={memberships.error}>
+                {memberships.error.body.message}
+            </template>
+        </div>
+    </lightning-card>
+</template>

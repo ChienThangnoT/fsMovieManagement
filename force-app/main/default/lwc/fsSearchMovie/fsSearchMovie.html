@@ -1,0 +1,16 @@
+<template>
+    <div class="slds-grid slds-gutters">
+        <div class="slds-col slds-size_1-of-3">
+            <lightning-input label="Start Date" type="date" value={startDate} onchange={handleStartDateChange}></lightning-input>
+        </div>
+        <div class="slds-col slds-size_1-of-3">
+            <lightning-input label="End Date" type="date" value={endDate} onchange={handleEndDateChange}></lightning-input>
+        </div>
+        <div class="slds-col slds-size_1-of-3">
+            <lightning-input label="Search" type="text" value={searchText} onchange={handleSearchTextChange}></lightning-input>
+        </div>
+    </div>
+    <div class="slds-m-top_medium">
+        <lightning-button label="Search" onclick={handleSearch}></lightning-button>
+    </div>
+</template>

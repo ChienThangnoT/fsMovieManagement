@@ -1,0 +1,11 @@
+.slds-m-around_medium li{
+    display: inline;
+    text-align: center;
+    padding: 14px 36px;
+    font-size: 17ppx;
+    font-style: italic;
+}
+.slds-m-around_medium li span{
+    font-weight: bold;
+    font-size: 17px;
+}

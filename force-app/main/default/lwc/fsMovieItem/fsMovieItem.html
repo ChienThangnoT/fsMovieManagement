@@ -1,0 +1,30 @@
+<template>
+    <article class="slds-card">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media  ">
+                <div class="slds-media__figure">
+                    <div> 
+                        <img src={movieImageUrl} alt={movieTitle} />
+                    </div>
+                </div>
+                <div class="slds-media__body movieItem">
+                    <h2 class="slds-card__header-title">
+                        <a href="javascript:void(0);">{movieTitle}</a>
+                    </h2>
+                    <p class="slds-text-body_small">
+                        <span>Duration:</span> {movieDuration} minutes
+                    </p>
+                    <p class="slds-text-body_small">
+                        <span>Genre:</span> {movieGenre}
+                    </p>
+                    <p class="slds-text-body_small">
+                        <span>Premiere date:</span> {moviePremiere}
+                    </p>
+                    <div>
+                        <button class="button-35" role="button"><span class="text">Booking</span></button>
+                    </div>
+                </div>
+            </header>
+        </div>
+    </article>
+</template>
