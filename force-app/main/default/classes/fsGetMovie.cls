@@ -1,11 +1,14 @@
 public with sharing class fsGetMovie {
 
     @AuraEnabled(cacheable=true)
-    public static List<MovieWrapper> fsgetMovie(Integer pageNumber, Integer pageSize) {
+    public static List<MovieWrapper> fsgetMovie(String title, Integer pageNumber, Integer pageSize) {
         Integer offset = (pageNumber - 1) * pageSize;
         
         List<Movie__c> movies = [SELECT Id, Name, Duration__c, Genre__c, Description__c, Status__c, Title__c, Movie_img_Url__c, Movie_trailer_URL__c, End_DateE__c, Premiere_date__c
-                                 FROM Movie__c LIMIT :pageSize OFFSET :offset];
+                                 FROM Movie__c
+                                 WHERE Title__c LIKE :('%' + title + '%')
+                                 ORDER BY Premiere_date__c
+                                 LIMIT :pageSize OFFSET :offset];
 
         List<MovieWrapper> movieWrappers = new List<MovieWrapper>();
         for (Movie__c movie : movies) {

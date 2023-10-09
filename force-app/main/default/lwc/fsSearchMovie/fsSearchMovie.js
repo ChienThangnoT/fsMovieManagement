@@ -1,47 +1,37 @@
-import { LightningElement, track } from 'lwc';
+import { LightningElement, wire, track } from 'lwc';
 import fsgetMovie from '@salesforce/apex/fsGetMovie.fsgetMovie';
 
-export default class MovieSearch extends LightningElement {
-    @track title = '';
-    @track startDate = '';
-    @track endDate = '';
-    @track pageSize = 10;
-    @track pageIndex = 1;
-    @track movies = [];
+export default class fsSearchMovie extends LightningElement {
+    @track searchQuery = '';
+    @track filteredMovies;
+    @track error;
+    @track pageNumber = 1;
+    @track pageSize = 6;
 
-    handleTitleChange(event) {
-        this.title = event.target.value;
+    handleSearch(event) {
+        this.searchQuery = event.target.value;
+        this.pageNumber = 1; 
     }
 
-    handleStartDateChange(event) {
-        this.startDate = event.target.value;
+    @wire(fsgetMovie, { title: '$searchQuery', pageNumber: '$pageNumber', pageSize: '$pageSize' })
+    wiredMovies({ error, data }) {
+        if (data) {
+            this.filteredMovies = data;
+        } else if (error) {
+            this.error = error;
+        }
     }
 
-    handleEndDateChange(event) {
-        this.endDate = event.target.value;
+    handlePreviousPage() {
+        if (this.pageNumber > 1) {
+            this.pageNumber--;
+        }
     }
 
-    handlePageSizeChange(event) {
-        this.pageSize = parseInt(event.target.value);
+    handleNextPage() {
+        if (this.filteredMovies.length === this.pageSize) {
+            this.pageNumber++;
+        }
     }
-
-    handlePageIndexChange(event) {
-        this.pageIndex = parseInt(event.target.value);
-    }
-
-    handleSearchClick() {
-        fsGetMovie({ 
-            pageNumber: this.pageIndex, 
-            pageSize: this.pageSize, 
-            title: this.title, 
-            startDate: this.startDate, 
-            endDate: this.endDate 
-        })
-        .then(result => {
-            this.movies = result;
-        })
-        .catch(error => {
-            console.error('Error fetching movie data', error);
-        });
-    }
+    
 }

@@ -1,7 +1,6 @@
 public with sharing class fsGetMember {
 
     public fsGetMember() {
-        // Constructor logic if needed
     }
 
     @AuraEnabled(cacheable=true)
