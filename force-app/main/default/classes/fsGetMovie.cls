@@ -1,14 +1,23 @@
 public with sharing class fsGetMovie {
 
     @AuraEnabled(cacheable=true)
-    public static List<MovieWrapper> fsgetMovie(String title, Integer pageNumber, Integer pageSize) {
+    public static List<MovieWrapper> fsgetMovie(String title, Date startDate, Date endDate, Integer pageNumber, Integer pageSize) {
         Integer offset = (pageNumber - 1) * pageSize;
         
-        List<Movie__c> movies = [SELECT Id, Name, Duration__c, Genre__c, Description__c, Status__c, Title__c, Movie_img_Url__c, Movie_trailer_URL__c, End_DateE__c, Premiere_date__c
-                                 FROM Movie__c
-                                 WHERE Title__c LIKE :('%' + title + '%')
-                                 ORDER BY Premiere_date__c
-                                 LIMIT :pageSize OFFSET :offset];
+        Date sevenDaysAgo = startDate.addDays(-7);
+        
+        if (startDate > endDate) {
+            throw new AuraHandledException('End Date must be greater than or equal to Start Date.');
+        } else if (startDate > sevenDaysAgo) {
+            throw new AuraHandledException('Start Date must be at least 7 days before End Date.');
+        }
+        
+        List<Movie__c> movies = [SELECT Id, Name, Duration__c, Genre__c, Description__c, Status__c, Title__c, Movie_img_Url__c, Movie_trailer_URL__c, Premiere_date__c, End_DateE__c
+                                FROM Movie__c
+                                WHERE Title__c LIKE :('%' + title + '%')
+                                
+                                ORDER BY Premiere_date__c
+                                LIMIT :pageSize OFFSET :offset];
 
         List<MovieWrapper> movieWrappers = new List<MovieWrapper>();
         for (Movie__c movie : movies) {
@@ -17,6 +26,16 @@ public with sharing class fsGetMovie {
         
         return movieWrappers;
     }
+
+
+    @AuraEnabled(cacheable=true)
+    public static List<Movie__c> getMovieTrailer(String currentMovieId) {
+        return [SELECT Id, Name, Movie_trailer_URL__c 
+                FROM Movie__c
+                WHERE Id = :currentMovieId];
+    }
+
+        
 
     public class MovieWrapper {
         @AuraEnabled

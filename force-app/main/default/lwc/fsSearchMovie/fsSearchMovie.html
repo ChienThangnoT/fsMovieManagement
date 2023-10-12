@@ -1,6 +1,14 @@
 <template>
     <lightning-card title="Enjoy your time with FSoft Cinema">
-        <lightning-input type="text" onchange={handleSearch} placeholder="Seach your movie"></lightning-input>
+        <lightning-input type="text" onchange={handleSearch} placeholder="Search your movie"></lightning-input>
+        <lightning-input type="date" label="Start Date" onchange={handleStartDateChange}></lightning-input>
+        <lightning-input type="date" label="End Date" onchange={handleEndDateChange}></lightning-input>
+        <template if:true={error}>
+            <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_warning" role="alert">
+                <span class="slds-assistive-text">Warning</span>
+                {error}
+            </div>
+        </template>
         <template if:true={filteredMovies}>
             <c-fs-list-movie movies={filteredMovies}></c-fs-list-movie>
         </template>
