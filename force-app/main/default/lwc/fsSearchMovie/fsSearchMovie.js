@@ -4,39 +4,67 @@ import fsgetMovie from '@salesforce/apex/fsGetMovie.fsgetMovie';
 
 export default class fsSearchMovie extends LightningElement {
     @track searchQuery = '';
-    @track startDate = null;
-    @track endDate = null;
-    @track filteredMovies;
+    @track filteredMovies = [];
     @track error;
     @track pageNumber = 1;
     @track pageSize = 6;
+    @track oldDate;
+    @track oldDate2;
+
+    connectedCallback() {
+        this.loadMovies();
+    }
 
     handleSearch(event) {
         this.searchQuery = event.target.value;
-        this.pageNumber = 1; 
+        this.pageNumber = 1;
+        this.loadMovies();
     }
 
-    handleStartDateChange(event) {
-        this.startDate = event.target.value;
-    }
-
-    handleEndDateChange(event) {
-        this.endDate = event.target.value;
-    }
-
-    @wire(fsgetMovie, { title: '$searchQuery', pageNumber: '$pageNumber', pageSize: '$pageSize' })
-    wiredMovies({ error, data }) {
-        if (data) {
-            this.filteredMovies = data;
-        } else if (error) {
-            this.error = error;
-            const toastEvent = new ShowToastEvent({
-                title: 'Error',
-                message: error.body.message,
-                variant: 'error'
-            });
-            this.dispatchEvent(toastEvent);
+    handleChangeAction(event) {
+        if (event.target.name === 'oldDate') {
+            this.oldDate = event.target.value;
         }
+
+        if (event.target.name === 'oldDate2') {
+            this.oldDate2 = event.target.value;
+        }
+
+        this.loadMovies();
+    }
+
+    handlePreviousPage() {
+        if (this.pageNumber > 1) {
+            this.pageNumber--;
+            this.loadMovies();
+        }
+    }
+
+    handleNextPage() {
+        this.pageNumber++;
+        this.loadMovies();
+    }
+
+    loadMovies() {
+        fsgetMovie({
+            title: this.searchQuery,
+            dateStr1: this.oldDate,
+            dateStr2: this.oldDate2,
+            pageNumber: this.pageNumber,
+            pageSize: this.pageSize
+        })
+            .then(result => {
+                this.filteredMovies = result;
+            })
+            .catch(error => {
+                this.error = error;
+                const toastEvent = new ShowToastEvent({
+                    title: 'Error',
+                    message: error.body.message,
+                    variant: 'error'
+                });
+                this.dispatchEvent(toastEvent);
+            });
     }
 
     get isPreviousDisabled() {
@@ -44,18 +72,6 @@ export default class fsSearchMovie extends LightningElement {
     }
 
     get isNextDisabled() {
-        return this.filteredMovies && this.filteredMovies.length < this.pageSize;
-    }
-
-    handlePreviousPage() {
-        if (this.pageNumber > 1) {
-            this.pageNumber--;
-        }
-    }
-
-    handleNextPage() {
-        if (this.filteredMovies && this.filteredMovies.length === this.pageSize) {
-            this.pageNumber++;
-        }
+        return this.filteredMovies.length < this.pageSize;
     }
 }

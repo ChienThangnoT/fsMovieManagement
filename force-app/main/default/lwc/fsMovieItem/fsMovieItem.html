@@ -21,7 +21,9 @@
                         <span>Premiere date:</span> {moviePremiere}
                     </p>
                     <div>
-                        <button class="button-35" role="button"><span class="text">Booking</span></button>
+                        <button class="button-35" role="button" data-movieid={movie.Id} onclick={handleBookingClick}>
+                            <span class="text">Booking</span>
+                        </button>
                     </div>
                 </div>
             </header>

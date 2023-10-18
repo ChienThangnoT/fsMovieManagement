@@ -1,0 +1,34 @@
+<template>
+    <template if:true={hasBookings}>
+        <table>
+            <thead>
+                <tr>
+                    <th>Movie Title</th>
+                    <th>Show Time</th>
+                    <th>Normal Seats</th>
+                    <th>VIP Seats</th>
+                    <th>VVIP Seats</th>
+                    <th>Booking Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                <template for:each={bookings} for:item="booking">
+                    <tr key={booking.Id}>
+                        <td>{booking.Movie__r.Title__c}</td>
+                        <td>{booking.ShowTime__r.ShowingDate__c}</td>
+                        <td if:true={booking.Availabel_Seat__r.Normal__c}>{booking.Availabel_Seat__r.Normal__c}</td>
+                        <td if:true={booking.Availabel_Seat__r.VIP__c}>{booking.Availabel_Seat__r.VIP__c}</td>
+                        <td if:true={booking.Availabel_Seat__r.VVIP__c}>{booking.Availabel_Seat__r.VVIP__c}</td>
+                        <td>{booking.Name}</td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </template>
+    <template if:true={hasSeatInfo}>
+        <!-- Some content to display when at least one booking has seat info -->
+    </template>
+    <template if:false={hasBookings}>
+        <p>No Booking</p>
+    </template>
+</template>

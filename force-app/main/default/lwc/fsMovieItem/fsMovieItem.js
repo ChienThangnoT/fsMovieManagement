@@ -1,6 +1,7 @@
 import { LightningElement, api } from 'lwc';
+import { NavigationMixin } from 'lightning/navigation';
 
-export default class fsListMovieItem extends LightningElement {
+export default class fsListMovieItem extends NavigationMixin(LightningElement) {
     @api movie;
 
     get movieImageUrl() {
@@ -21,5 +22,14 @@ export default class fsListMovieItem extends LightningElement {
 
     get movieGenre() {
         return this.movie.Genre;
+    }
+    
+    handleBookingClick() {
+        this[NavigationMixin.Navigate]({
+            type: 'standard__navItemPage',
+            attributes: {
+                apiName: 'Booking_Movie'
+            },
+        });
     }
 }

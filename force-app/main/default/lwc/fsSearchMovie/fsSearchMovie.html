@@ -1,8 +1,24 @@
 <template>
     <lightning-card title="Enjoy your time with FSoft Cinema">
-        <lightning-input type="text" onchange={handleSearch} placeholder="Search your movie"></lightning-input>
-        <lightning-input type="date" label="Start Date" onchange={handleStartDateChange}></lightning-input>
-        <lightning-input type="date" label="End Date" onchange={handleEndDateChange}></lightning-input>
+        
+        <div class="slds-grid slds-wrap">
+            <div class="slds-col slds-size_4-of-12 slds-p-horizontal--small slds-m-bottom--medium">
+                <div class="slds-form-element__control">
+                    <lightning-input type="text" onchange={handleSearch} placeholder="Search your movie"></lightning-input>
+                </div>
+            </div>
+            <div class="slds-col slds-size_4-of-12 slds-p-horizontal--small slds-m-bottom--medium">
+                <div class="slds-form-element__control">
+                    <lightning-input type="Date" label="From" value={oldDate} name="oldDate" onchange={handleChangeAction}></lightning-input>
+                </div>
+            </div>
+            <div class="slds-col slds-size_4-of-12 slds-p-horizontal--small slds-m-bottom--medium">
+                <div class="slds-form-element__control">
+                    <lightning-input type="Date" label="To" value={oldDate2} name="oldDate2" onchange={handleChangeAction}></lightning-input>
+                </div>
+            </div>
+        </div>
+
         <template if:true={error}>
             <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_warning" role="alert">
                 <span class="slds-assistive-text">Warning</span>

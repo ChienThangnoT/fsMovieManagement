@@ -1,18 +1,9 @@
-public with sharing class fsGetMovie {
+public with sharing class fsGetMovie {  
 
     @AuraEnabled(cacheable=true)
-    public static List<MovieWrapper> fsgetMovie(String title, Date startDate, Date endDate, Integer pageNumber, Integer pageSize) {
+    public static List<MovieWrapper> getAllMovies(String title, Integer pageNumber, Integer pageSize) {
         Integer offset = (pageNumber - 1) * pageSize;
-        
-        Date sevenDaysAgo = startDate.addDays(-7);
-        
-        if (startDate > endDate) {
-            throw new AuraHandledException('End Date must be greater than or equal to Start Date.');
-        } else if (startDate > sevenDaysAgo) {
-            throw new AuraHandledException('Start Date must be at least 7 days before End Date.');
-        }
-        
-        List<Movie__c> movies = [SELECT Id, Name, Duration__c, Genre__c, Description__c, Status__c, Title__c, Movie_img_Url__c, Movie_trailer_URL__c, Premiere_date__c, End_DateE__c
+        List<Movie__c> movies = [SELECT Id, Name, Duration__c, Genre__c, Description__c, Status__c, Title__c, Movie_img_Url__c, Movie_trailer_URL__c, Premiere_date__c, End_DateE__c, Director__c, Performer__c
                                 FROM Movie__c
                                 WHERE Title__c LIKE :('%' + title + '%')
                                 
@@ -27,14 +18,55 @@ public with sharing class fsGetMovie {
         return movieWrappers;
     }
 
+    @AuraEnabled(cacheable=true)
+    public static List<MovieWrapper> fsgetMovie(String title, Date dateStr1, Date dateStr2, Integer pageNumber, Integer pageSize) {
+        Integer offset = (pageNumber - 1) * pageSize;
+        String titleFilter = '%' + title + '%';
+
+        String dynamicQuery = 'SELECT Id, Name, Duration__c, Genre__c, Description__c, Status__c, Title__c, Director__c, Performer__c, Movie_img_Url__c, Movie_trailer_URL__c, Premiere_date__c, End_DateE__c FROM Movie__c';
+
+        if (!String.isBlank(title)) {
+            dynamicQuery += ' WHERE Title__c LIKE :titleFilter';
+        }
+
+        if (dateStr1 != null && dateStr2 != null) {
+            if (!String.isBlank(title)) {
+                dynamicQuery += ' AND';
+            } else {
+                dynamicQuery += ' WHERE';
+            }
+            dynamicQuery += ' Premiere_date__c >= :dateStr1 AND Premiere_date__c <= :dateStr2';
+        }
+
+        dynamicQuery += ' ORDER BY Premiere_date__c LIMIT :pageSize OFFSET :offset';
+
+        List<Movie__c> movies = Database.query(dynamicQuery);
+
+        List<MovieWrapper> movieWrappers = new List<MovieWrapper>();
+        for (Movie__c movie : movies) {
+            movieWrappers.add(new MovieWrapper(movie));
+        }
+
+        return movieWrappers;
+    }
+
+
 
     @AuraEnabled(cacheable=true)
     public static List<Movie__c> getMovieTrailer(String currentMovieId) {
-        return [SELECT Id, Name, Movie_trailer_URL__c 
+        return [SELECT Id, Name, Duration__c, Genre__c, Description__c, Status__c, Title__c,
+                Movie_img_Url__c, Movie_trailer_URL__c, Premiere_date__c, End_DateE__c, Director__c, Performer__c
                 FROM Movie__c
                 WHERE Id = :currentMovieId];
     }
 
+    @AuraEnabled(cacheable=true)
+    public static List<Movie__c> getMovieTrailerForBooking(String currentMovieId) {
+        return [SELECT Id, Name, Duration__c, Genre__c, Description__c, Status__c, Title__c,
+                Movie_img_Url__c, Movie_trailer_URL__c, Premiere_date__c, End_DateE__c, Director__c, Performer__c
+                FROM Movie__c
+                WHERE Id = :currentMovieId];
+    }
         
 
     public class MovieWrapper {
@@ -60,6 +92,11 @@ public with sharing class fsGetMovie {
         public Date Premiere_date { get; set; }
         @AuraEnabled
         public Date End_DateE { get; set; }
+        @AuraEnabled
+        public String Director { get; set; }
+        @AuraEnabled
+        public String Performer { get; set; }
+        
         public MovieWrapper(Movie__c movie) {
             Id = movie.Id;
             Name = movie.Name;
@@ -72,6 +109,8 @@ public with sharing class fsGetMovie {
             Movie_trailer_URL = movie.Movie_trailer_URL__c;
             Premiere_date = movie.Premiere_date__c;
             End_DateE = movie.End_DateE__c;
+            Director = movie.Director__c;
+            Performer = movie.Performer__c;
         }
     }
 }
